@@ -1,10 +1,14 @@
 package com.codepath.android.booksearch.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.ShareActionProvider;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ShareCompat;
+import androidx.core.view.MenuItemCompat;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +27,9 @@ public class BookDetailActivity extends AppCompatActivity {
     private ImageView ivBookCover;
     private TextView tvTitle;
     private TextView tvAuthor;
+    private ShareActionProvider miShareAction;
+    private Intent shareIntent;
+    private Book book;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +44,7 @@ public class BookDetailActivity extends AppCompatActivity {
         tvAuthor = (TextView) findViewById(R.id.tvAuthor);
 
         // Extract book object from intent extras
-        Book book = (Book) Parcels.unwrap(getIntent().getParcelableExtra("book"));
+        book = (Book) Parcels.unwrap(getIntent().getParcelableExtra("book"));
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -46,6 +53,9 @@ public class BookDetailActivity extends AppCompatActivity {
         tvTitle.setText(book.getTitle());
         tvAuthor.setText(book.getAuthor());
         Glide.with(this).load(book.getCoverUrl()).into(ivBookCover);
+
+
+
 
         // Checkpoint #5
         // Reuse the Toolbar previously used in the detailed activity by referring to this guide
@@ -61,9 +71,18 @@ public class BookDetailActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_book_detail, menu);
         // Checkpoint #6
         // Add Share Intent
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+        miShareAction = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        String imageLink = book.getCoverUrl();
+        String yourShareText = "Share image" + imageLink;
+        shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setType("text/plain").setText(yourShareText).getIntent();
+        // Set the share Intent
+        miShareAction.setShareIntent(shareIntent);
+        return true;
         // see http://guides.codepath.org/android/Sharing-Content-with-Intents#shareactionprovider
         // (Bonus) Share book title and cover image using the same intent.
-        return true;
+
     }
 
     @Override
